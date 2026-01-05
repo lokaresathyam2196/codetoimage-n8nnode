@@ -238,6 +238,9 @@ Make sure you're using Node.js v22 or higher and have run `npm install` to get a
 - **[n8n Creator Portal](https://creators.n8n.io/nodes)** - Submit your node for verification
 - **[Submit Community Nodes Guide](https://docs.n8n.io/integrations/creating-nodes/deploy/submit-community-nodes/)** - Verification requirements and process
 
+## Created using declarative style node
+https://docs.n8n.io/integrations/creating-nodes/build/declarative-style-node
+
 ## Contributing
 
 Have suggestions for improving this starter? [Open an issue](https://github.com/n8n-io/n8n-nodes-starter/issues) or submit a pull request!
