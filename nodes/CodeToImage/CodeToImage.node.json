@@ -1,19 +1,19 @@
 {
-	"node": "n8n-nodes-base.NasaPics",
+	"node": "n8n-nodes-codeToImage",
 	"nodeVersion": "1.0",
 	"codexVersion": "1.0",
 	"categories": [
-		"Miscellaneous"
+		"Transform"
 	],
 	"resources": {
 		"credentialDocumentation": [
 			{
-				"url": ""
+				"url": "https://github.com/lokaresathyam2196/codetoimage-n8nnode"
 			}
 		],
 		"primaryDocumentation": [
 			{
-				"url": ""
+				"url": "https://github.com/lokaresathyam2196/codetoimage-n8nnode"
 			}
 		]
 	}

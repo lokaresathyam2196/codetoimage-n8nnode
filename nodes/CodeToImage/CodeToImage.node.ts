@@ -1,188 +1,215 @@
-import { INodeType, INodeTypeDescription } from 'n8n-workflow';
+import { NodeConnectionTypes, type INodeType, type INodeTypeDescription } from 'n8n-workflow';
 
 export class CodeToImage implements INodeType {
 	description: INodeTypeDescription = {
-		// Basic node details will go here
-        displayName: 'Code To Image',
-        name: 'codeToImage',
-        icon: 'file:codetoimage.svg',
-        group: ['transform'],
-        version: 1,
-        subtitle: '={{$parameter["operation"] + ": " + $parameter["resource"]}}',
-        description: 'Get data from CodeToImages API',
-        defaults: {
-            name: 'Code To Image',
-        },
-        inputs: ['main'],
-        outputs: ['main'],
-        credentials: [
-            {
-                name: 'CodeToImageApi',
-                required: true,
-            },
-        ],
-        requestDefaults: {
-            baseURL: 'https://api.nasa.gov',
-            headers: {
-                Accept: 'application/json',
-                'Content-Type': 'application/json',
-            },
-        },
+		displayName: 'Code To Image',
+		name: 'codeToImage',
+		icon: 'file:codetoimage.svg',
+		group: ['transform'],
+		version: 1,
+		subtitle: '={{$parameter["operation"]}}',
+		description: 'Convert code snippets into beautiful syntax-highlighted images',
+		defaults: {
+			name: 'Code To Image',
+		},
+		inputs: [NodeConnectionTypes.Main],
+		outputs: [NodeConnectionTypes.Main],
+		credentials: [
+			{
+				name: 'CodeToImageApi',
+				required: true,
+			},
+		],
+		requestDefaults: {
+			baseURL: '={{$credentials.baseUrl}}',
+			headers: {
+				'Content-Type': 'application/json',
+			},
+		},
 		properties: [
-            {
-                displayName: 'Resource',
-                name: 'resource',
-                type: 'options',
-                noDataExpression: true,
-                options: [
-                    {
-                        name: 'Astronomy Picture of the Day',
-                        value: 'astronomyPictureOfTheDay',
-                    },
-                    {
-                        name: 'Mars Rover Photos',
-                        value: 'marsRoverPhotos',
-                    }
-                ],
-                default: 'astronomyPictureOfTheDay'
-            },
-            {
-                displayName: 'Operation',
-                name: 'operation',
-                type: 'options',
-                noDataExpression: true,
-                displayOptions: {
-                    show: {
-                        resource: [
-                            'astronomyPictureOfTheDay',
-                        ],
-                    },
-                },
-                options: [
-                    {
-                        name: 'Get',
-                        value: 'get',
-                        action: 'Get the APOD',
-                        description: 'Get the Astronomy Picture of the day',
-                        routing: {
-                            request: {
-                                method: 'GET',
-                                url: '/planetary/apod',
-                            },
-                        },
-                    },
-                ],
-                default: 'get'
-            },
-            {
-                displayName: 'Operation',
-                name: 'operation',
-                type: 'options',
-                noDataExpression: true,
-                displayOptions: {
-                    show: {
-                        resource: [
-                            'marsRoverPhotos',
-                        ],
-                    },
-                },
-                options: [
-                    {
-                        name: 'Get',
-                        value: 'get',
-                        action: 'Get Mars Rover photos',
-                        description: 'Get photos from the Mars Rover',
-                        routing: {
-                            request: {
-                                method: 'GET',
-                            },
-                        },
-                    },
-                ],
-                default: 'get',
-            },
-            {
-                displayName: 'Rover name',
-                description: 'Choose which Mars Rover to get a photo from',
-                required: true,
-                name: 'roverName',
-                type: 'options',
-                options: [
-                    {name: 'Curiosity', value: 'curiosity'},
-                    {name: 'Opportunity', value: 'opportunity'},
-                    {name: 'Perseverance', value: 'perseverance'},
-                    {name: 'Spirit', value: 'spirit'},
-                ],
-                routing: {
-                    request: {
-                        url: '=/mars-photos/api/v1/rovers/{{$value}}/photos',
-                    },
-                },
-                default: 'curiosity',
-                displayOptions: {
-                    show: {
-                        resource: [
-                            'marsRoverPhotos',
-                        ],
-                    },
-                },
-            },
-            {
-                displayName: 'Date',
-                description: 'Earth date',
-                required: true,
-                name: 'marsRoverDate',
-                type: 'dateTime',
-                default:'',
-                displayOptions: {
-                    show: {
-                        resource: [
-                            'marsRoverPhotos',
-                        ],
-                    },
-                },
-                routing: {
-                    request: {
-                        // You've already set up the URL. qs appends the value of the field as a query string
-                        qs: {
-                            earth_date: '={{ new Date($value).toISOString().substr(0,10) }}',
-                        },
-                    },
-                },
-            },
-            {
-                displayName: 'Additional Fields',
-                name: 'additionalFields',
-                type: 'collection',
-                default: {},
-                placeholder: 'Add Field',
-                displayOptions: {
-                    show: {
-                        resource: [
-                            'astronomyPictureOfTheDay',
-                        ],
-                        operation: [
-                            'get',
-                        ],
-                    },
-                },
-                options: [
-                    {
-                        displayName: 'Date',
-                        name: 'apodDate',
-                        type: 'dateTime',
-                        default: '',
-                        routing: {
-                            request: {
-                                // You've already set up the URL. qs appends the value of the field as a query string
-                                qs: {
-                                    date: '={{ new Date($value).toISOString().substr(0,10) }}',
-                                },
-                            },
-                        },
-                    },
-                ],									
-            }
-		]
+			{
+				displayName: 'Operation',
+				name: 'operation',
+				type: 'options',
+				noDataExpression: true,
+				options: [
+					{
+						name: 'Generate',
+						value: 'generate',
+						action: 'Generate code image',
+						description: 'Convert code to a syntax-highlighted image (SVG or PNG)',
+						routing: {
+							request: {
+								method: 'POST',
+								url: '/generate',
+							},
+						},
+					},
+				],
+				default: 'generate',
+			},
+			{
+				displayName: 'Code',
+				name: 'code',
+				type: 'string',
+				typeOptions: {
+					rows: 10,
+				},
+				required: true,
+				default: '',
+				description: 'The code snippet to convert to an image',
+				routing: {
+					request: {
+						body: {
+							code: '={{$value}}',
+						},
+					},
+				},
+			},
+			{
+				displayName: 'Language',
+				name: 'language',
+				type: 'options',
+				options: [
+					{ name: 'JavaScript', value: 'javascript' },
+					{ name: 'TypeScript', value: 'typescript' },
+					{ name: 'Python', value: 'python' },
+					{ name: 'Java', value: 'java' },
+					{ name: 'C', value: 'c' },
+					{ name: 'C++', value: 'cpp' },
+					{ name: 'C#', value: 'csharp' },
+					{ name: 'Go', value: 'go' },
+					{ name: 'Rust', value: 'rust' },
+					{ name: 'Ruby', value: 'ruby' },
+					{ name: 'PHP', value: 'php' },
+					{ name: 'HTML', value: 'html' },
+					{ name: 'CSS', value: 'css' },
+					{ name: 'JSON', value: 'json' },
+					{ name: 'YAML', value: 'yaml' },
+					{ name: 'Markdown', value: 'markdown' },
+					{ name: 'SQL', value: 'sql' },
+					{ name: 'Bash/Shell', value: 'bash' },
+				],
+				default: 'javascript',
+				description: 'Programming language for syntax highlighting',
+				routing: {
+					request: {
+						body: {
+							language: '={{$value}}',
+						},
+					},
+				},
+			},
+			{
+				displayName: 'Format',
+				name: 'format',
+				type: 'options',
+				options: [
+					{
+						name: 'SVG',
+						value: 'svg',
+						description: 'Fast, scalable vector format',
+					},
+					{
+						name: 'PNG',
+						value: 'png',
+						description: 'High quality raster format (2x retina)',
+					},
+				],
+				default: 'svg',
+				description: 'Output image format',
+				routing: {
+					request: {
+						body: {
+							format: '={{$value}}',
+						},
+					},
+				},
+			},
+			{
+				displayName: 'Theme',
+				name: 'theme',
+				type: 'options',
+				options: [
+					{ name: 'GitHub Dark', value: 'github-dark' },
+					{ name: 'GitHub Light', value: 'github-light' },
+					{ name: 'Dracula', value: 'dracula' },
+					{ name: 'Monokai', value: 'monokai' },
+					{ name: 'Nord', value: 'nord' },
+					{ name: 'One Dark Pro', value: 'one-dark-pro' },
+					{ name: 'Tokyo Night', value: 'tokyo-night' },
+					{ name: 'Catppuccin Mocha', value: 'catppuccin-mocha' },
+				],
+				default: 'github-dark',
+				description: 'Syntax highlighting theme',
+				routing: {
+					request: {
+						body: {
+							theme: '={{$value}}',
+						},
+					},
+				},
+			},
+			{
+				displayName: 'Background',
+				name: 'background',
+				type: 'string',
+				default: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
+				description: 'CSS background (gradient or color). Example: "#1a1a2e" or "linear-gradient(135deg, #667eea 0%, #764ba2 100%)"',
+				routing: {
+					request: {
+						body: {
+							background: '={{$value}}',
+						},
+					},
+				},
+			},
+			{
+				displayName: 'Padding',
+				name: 'padding',
+				type: 'number',
+				typeOptions: {
+					minValue: 16,
+					maxValue: 128,
+				},
+				default: 64,
+				description: 'Padding in pixels (16-128 recommended)',
+				routing: {
+					request: {
+						body: {
+							padding: '={{$value}}',
+						},
+					},
+				},
+			},
+			{
+				displayName: 'Show Line Numbers',
+				name: 'showLineNumbers',
+				type: 'boolean',
+				default: true,
+				description: 'Whether to show line numbers',
+				routing: {
+					request: {
+						body: {
+							showLineNumbers: '={{$value}}',
+						},
+					},
+				},
+			},
+			{
+				displayName: 'Show Window Controls',
+				name: 'showWindowControls',
+				type: 'boolean',
+				default: true,
+				description: 'Whether to show macOS-style window controls',
+				routing: {
+					request: {
+						body: {
+							showWindowControls: '={{$value}}',
+						},
+					},
+				},
+			},
+		],
 	};
 }
