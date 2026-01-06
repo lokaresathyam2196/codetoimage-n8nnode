@@ -1,23 +1,23 @@
 import { INodeType, INodeTypeDescription } from 'n8n-workflow';
 
-export class NasaPics implements INodeType {
+export class CodeToImage implements INodeType {
 	description: INodeTypeDescription = {
 		// Basic node details will go here
-        displayName: 'NASA Pics',
-        name: 'nasaPics',
-        icon: 'file:nasapics.svg',
+        displayName: 'Code To Image',
+        name: 'codeToImage',
+        icon: 'file:codetoimage.svg',
         group: ['transform'],
         version: 1,
         subtitle: '={{$parameter["operation"] + ": " + $parameter["resource"]}}',
-        description: 'Get data from NASAs API',
+        description: 'Get data from CodeToImages API',
         defaults: {
-            name: 'NASA Pics',
+            name: 'Code To Image',
         },
         inputs: ['main'],
         outputs: ['main'],
         credentials: [
             {
-                name: 'NasaPicsApi',
+                name: 'CodeToImageApi',
                 required: true,
             },
         ],

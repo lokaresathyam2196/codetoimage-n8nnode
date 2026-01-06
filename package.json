@@ -1,5 +1,5 @@
 {
-	"name": "n8n-nodes-codetoimage",
+	"name": "codetoimage",
 	"version": "0.1.0",
 	"description": "Convert a code script to an image",
 	"license": "MIT",
