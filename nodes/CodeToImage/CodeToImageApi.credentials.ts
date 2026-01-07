@@ -23,14 +23,6 @@ export class CodeToImageApi implements ICredentialType {
 			default: '',
 			description: 'Your Code to Image API key from JAAS',
 		},
-		{
-			displayName: 'Base URL',
-			name: 'baseUrl',
-			type: 'string',
-			default: 'https://your-lambda-url.execute-api.us-east-1.amazonaws.com/dev',
-			description: 'The base URL of your Code to Image Lambda API',
-			placeholder: 'https://abc123.execute-api.us-east-1.amazonaws.com/dev',
-		},
 	];
 
 	authenticate: IAuthenticateGeneric = {
@@ -44,7 +36,7 @@ export class CodeToImageApi implements ICredentialType {
 
 	test: ICredentialTestRequest = {
 		request: {
-			baseURL: '={{$credentials?.baseUrl}}',
+			baseURL: 'https://1hsik4xyb5.execute-api.us-east-1.amazonaws.com/dev',
 			url: '/generate',
 			method: 'POST',
 			body: {

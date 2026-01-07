@@ -1,4 +1,10 @@
-import { NodeConnectionTypes, type INodeType, type INodeTypeDescription } from 'n8n-workflow';
+import {
+	NodeConnectionTypes,
+	type INodeType,
+	type INodeTypeDescription,
+	type IExecuteFunctions,
+	type INodeExecutionData,
+} from 'n8n-workflow';
 
 export class CodeToImage implements INodeType {
 	description: INodeTypeDescription = {
@@ -20,12 +26,6 @@ export class CodeToImage implements INodeType {
 				required: true,
 			},
 		],
-		requestDefaults: {
-			baseURL: '={{$credentials.baseUrl}}',
-			headers: {
-				'Content-Type': 'application/json',
-			},
-		},
 		properties: [
 			{
 				displayName: 'Operation',
@@ -37,13 +37,7 @@ export class CodeToImage implements INodeType {
 						name: 'Generate',
 						value: 'generate',
 						action: 'Generate code image',
-						description: 'Convert code to a syntax-highlighted image (SVG or PNG)',
-						routing: {
-							request: {
-								method: 'POST',
-								url: '/generate',
-							},
-						},
+						description: 'Convert code to a syntax-highlighted image (SVG, PNG, or Base64)',
 					},
 				],
 				default: 'generate',
@@ -58,13 +52,6 @@ export class CodeToImage implements INodeType {
 				required: true,
 				default: '',
 				description: 'The code snippet to convert to an image',
-				routing: {
-					request: {
-						body: {
-							code: '={{$value}}',
-						},
-					},
-				},
 			},
 			{
 				displayName: 'Language',
@@ -92,13 +79,6 @@ export class CodeToImage implements INodeType {
 				],
 				default: 'javascript',
 				description: 'Programming language for syntax highlighting',
-				routing: {
-					request: {
-						body: {
-							language: '={{$value}}',
-						},
-					},
-				},
 			},
 			{
 				displayName: 'Format',
@@ -108,23 +88,21 @@ export class CodeToImage implements INodeType {
 					{
 						name: 'SVG',
 						value: 'svg',
-						description: 'Fast, scalable vector format',
+						description: 'Fast, scalable vector format (binary data)',
 					},
 					{
 						name: 'PNG',
 						value: 'png',
-						description: 'High quality raster format (2x retina)',
+						description: 'High quality raster format (2x retina, binary data)',
+					},
+					{
+						name: 'Base64',
+						value: 'base64',
+						description: 'PNG as base64 string (for API integration)',
 					},
 				],
 				default: 'svg',
 				description: 'Output image format',
-				routing: {
-					request: {
-						body: {
-							format: '={{$value}}',
-						},
-					},
-				},
 			},
 			{
 				displayName: 'Theme',
@@ -142,13 +120,6 @@ export class CodeToImage implements INodeType {
 				],
 				default: 'github-dark',
 				description: 'Syntax highlighting theme',
-				routing: {
-					request: {
-						body: {
-							theme: '={{$value}}',
-						},
-					},
-				},
 			},
 			{
 				displayName: 'Background',
@@ -156,13 +127,6 @@ export class CodeToImage implements INodeType {
 				type: 'string',
 				default: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
 				description: 'CSS background (gradient or color). Example: "#1a1a2e" or "linear-gradient(135deg, #667eea 0%, #764ba2 100%)"',
-				routing: {
-					request: {
-						body: {
-							background: '={{$value}}',
-						},
-					},
-				},
 			},
 			{
 				displayName: 'Padding',
@@ -174,13 +138,6 @@ export class CodeToImage implements INodeType {
 				},
 				default: 64,
 				description: 'Padding in pixels (16-128 recommended)',
-				routing: {
-					request: {
-						body: {
-							padding: '={{$value}}',
-						},
-					},
-				},
 			},
 			{
 				displayName: 'Show Line Numbers',
@@ -188,13 +145,6 @@ export class CodeToImage implements INodeType {
 				type: 'boolean',
 				default: true,
 				description: 'Whether to show line numbers',
-				routing: {
-					request: {
-						body: {
-							showLineNumbers: '={{$value}}',
-						},
-					},
-				},
 			},
 			{
 				displayName: 'Show Window Controls',
@@ -202,14 +152,112 @@ export class CodeToImage implements INodeType {
 				type: 'boolean',
 				default: true,
 				description: 'Whether to show macOS-style window controls',
-				routing: {
-					request: {
-						body: {
-							showWindowControls: '={{$value}}',
-						},
-					},
-				},
 			},
 		],
 	};
+
+	async execute(this: IExecuteFunctions): Promise<INodeExecutionData[][]> {
+		const items = this.getInputData();
+		const returnData: INodeExecutionData[] = [];
+		const credentials = await this.getCredentials('CodeToImageApi');
+		const baseUrl = 'https://1hsik4xyb5.execute-api.us-east-1.amazonaws.com/dev';
+
+		for (let i = 0; i < items.length; i++) {
+			try {
+				// Get parameters
+				const code = this.getNodeParameter('code', i) as string;
+				const language = this.getNodeParameter('language', i) as string;
+				const format = this.getNodeParameter('format', i) as string;
+				const theme = this.getNodeParameter('theme', i) as string;
+				const background = this.getNodeParameter('background', i) as string;
+				const padding = this.getNodeParameter('padding', i) as number;
+				const showLineNumbers = this.getNodeParameter('showLineNumbers', i) as boolean;
+				const showWindowControls = this.getNodeParameter('showWindowControls', i) as boolean;
+
+				// Make HTTP request
+				const response = await this.helpers.request({
+					method: 'POST',
+					url: `${baseUrl}/generate`,
+					headers: {
+						'Content-Type': 'application/json',
+						'X-API-Key': credentials.apiKey as string,
+					},
+					body: {
+						code,
+						language,
+						format,
+						theme,
+						background,
+						padding,
+						showLineNumbers,
+						showWindowControls,
+					},
+					json: format === 'base64', // Parse JSON for base64 format
+					encoding: format === 'base64' ? 'utf8' : null, // Binary for SVG/PNG
+					resolveWithFullResponse: true,
+				});
+
+				// Handle response based on format
+				let binaryData;
+				const fileName = `code-${Date.now()}.${format === 'base64' ? 'png' : format}`;
+
+				if (format === 'base64') {
+					// Base64 format returns JSON with { data, mimeType, fileName }
+					const jsonResponse = response.body;
+					const base64Data = jsonResponse.data;
+					const buffer = Buffer.from(base64Data, 'base64');
+
+					binaryData = await this.helpers.prepareBinaryData(
+						buffer,
+						jsonResponse.fileName || fileName,
+						jsonResponse.mimeType || 'image/png',
+					);
+				} else if (format === 'png') {
+					// PNG returns binary data
+					const buffer = Buffer.isBuffer(response.body)
+						? response.body
+						: Buffer.from(response.body, 'binary');
+
+					binaryData = await this.helpers.prepareBinaryData(
+						buffer,
+						fileName,
+						'image/png',
+					);
+				} else {
+					// SVG returns text
+					const buffer = Buffer.from(response.body as string, 'utf8');
+
+					binaryData = await this.helpers.prepareBinaryData(
+						buffer,
+						fileName,
+						'image/svg+xml',
+					);
+				}
+
+				// Return as binary data
+				returnData.push({
+					json: {
+						fileName: binaryData.fileName,
+						mimeType: binaryData.mimeType,
+						fileSize: binaryData.fileSize,
+					},
+					binary: {
+						data: binaryData,
+					},
+				});
+			} catch (error) {
+				if (this.continueOnFail()) {
+					returnData.push({
+						json: {
+							error: error.message,
+						},
+					});
+					continue;
+				}
+				throw error;
+			}
+		}
+
+		return [returnData];
+	}
 }
