@@ -1,5 +1,5 @@
 {
-	"name": "codetoimage",
+	"name": "n8n-nodes-codetoimage",
 	"version": "0.1.0",
 	"description": "Convert a code script to an image",
 	"license": "MIT",
@@ -43,6 +43,7 @@
 	},
 	"devDependencies": {
 		"@n8n/node-cli": "*",
+		"@types/node": "^25.0.5",
 		"eslint": "9.32.0",
 		"prettier": "3.6.2",
 		"release-it": "^19.0.4",
