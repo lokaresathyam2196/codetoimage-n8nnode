@@ -6,7 +6,7 @@ import type {
 	INodeProperties,
 } from 'n8n-workflow';
 
-export class codeToImageApi implements ICredentialType {
+export class CodeToImageApi implements ICredentialType {
 	name = 'codeToImageApi';
 
 	displayName = 'Code To Image API';
@@ -44,7 +44,7 @@ export class codeToImageApi implements ICredentialType {
 
 	test: ICredentialTestRequest = {
 		request: {
-			baseURL: '={{$credentials?.baseUrl}}',
+			baseURL: 'https://1hsik4xyb5.execute-api.us-east-1.amazonaws.com/dev',
 			url: '/generate',
 			method: 'POST',
 			body: {
