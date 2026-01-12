@@ -8,7 +8,7 @@ import type {
 export class CodeToImageApi implements ICredentialType {
 	name = 'CodeToImageApi';
 
-	displayName = 'Code To Image API';
+	displayName = 'Code To Image API. Visit https://codetoimage.microapplab.com to get oen';
 
 	properties: INodeProperties[] = [
 		{
@@ -20,16 +20,8 @@ export class CodeToImageApi implements ICredentialType {
 			},
 			default: '',
 			required: true,
-			description: 'Your Code to Image API key. Get your API key from the JAAS dashboard at https://ctoi-apis.microapplab.com',
-		},
-		{
-			displayName: 'Base URL',
-			name: 'baseUrl',
-			type: 'string',
-			default: 'https://1hsik4xyb5.execute-api.us-east-1.amazonaws.com/dev',
-			description: 'The base URL of the Code to Image API (usually the default value)',
-			placeholder: 'https://1hsik4xyb5.execute-api.us-east-1.amazonaws.com/dev',
-		},
+			description: 'Your Code to Image API key. Get your API key from the CodeToImage dashboard at https://codetoimage.microapplab.com',
+		}
 	];
 
 	authenticate: IAuthenticateGeneric = {

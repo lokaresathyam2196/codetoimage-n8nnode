@@ -8,7 +8,7 @@ import type {
 export class CodeToImageApi implements ICredentialType {
 	name = 'CodeToImageApi';
 
-	displayName = 'Code To Image API';
+	displayName = 'Code To Image API. Visit https://codetoimage.microapplab.com to get one';
 
 	properties: INodeProperties[] = [
 		{
@@ -19,7 +19,7 @@ export class CodeToImageApi implements ICredentialType {
 				password: true,
 			},
 			default: '',
-			description: 'Your Code to Image API key from JAAS',
+			description: 'Your Code to Image API key from JAAS Get your API key from the CodeToImage dashboard at https://codetoimage.microapplab.com',
 		},
 	];
 
