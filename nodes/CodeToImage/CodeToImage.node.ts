@@ -4,6 +4,7 @@ import {
 	type INodeTypeDescription,
 	type IExecuteFunctions,
 	type INodeExecutionData,
+	type IHttpRequestOptions,
 } from 'n8n-workflow';
 
 export class CodeToImage implements INodeType {
@@ -20,9 +21,10 @@ export class CodeToImage implements INodeType {
 		},
 		inputs: [NodeConnectionTypes.Main],
 		outputs: [NodeConnectionTypes.Main],
+		usableAsTool: true,
 		credentials: [
 			{
-				name: 'CodeToImageApi',
+				name: 'codeToImageApi',
 				required: true,
 			},
 		],
@@ -51,7 +53,8 @@ export class CodeToImage implements INodeType {
 				},
 				required: true,
 				default: '',
-				description: 'The code snippet to convert to an image. Supports multi-line code with proper formatting.',
+				description:
+					'The code snippet to convert to an image. Supports multi-line code with proper formatting.',
 				placeholder: 'function hello() {\n  console.log("Hello World!");\n}',
 			},
 			{
@@ -59,27 +62,28 @@ export class CodeToImage implements INodeType {
 				name: 'language',
 				type: 'options',
 				options: [
-					{ name: 'JavaScript', value: 'javascript' },
-					{ name: 'TypeScript', value: 'typescript' },
-					{ name: 'Python', value: 'python' },
-					{ name: 'Java', value: 'java' },
-					{ name: 'C', value: 'c' },
-					{ name: 'C++', value: 'cpp' },
-					{ name: 'C#', value: 'csharp' },
-					{ name: 'Go', value: 'go' },
-					{ name: 'Rust', value: 'rust' },
-					{ name: 'Ruby', value: 'ruby' },
-					{ name: 'PHP', value: 'php' },
-					{ name: 'HTML', value: 'html' },
-					{ name: 'CSS', value: 'css' },
-					{ name: 'JSON', value: 'json' },
-					{ name: 'YAML', value: 'yaml' },
-					{ name: 'Markdown', value: 'markdown' },
-					{ name: 'SQL', value: 'sql' },
 					{ name: 'Bash/Shell', value: 'bash' },
+					{ name: 'C', value: 'c' },
+					{ name: 'C#', value: 'csharp' },
+					{ name: 'C++', value: 'cpp' },
+					{ name: 'CSS', value: 'css' },
+					{ name: 'Go', value: 'go' },
+					{ name: 'HTML', value: 'html' },
+					{ name: 'Java', value: 'java' },
+					{ name: 'JavaScript', value: 'javascript' },
+					{ name: 'JSON', value: 'json' },
+					{ name: 'Markdown', value: 'markdown' },
+					{ name: 'PHP', value: 'php' },
+					{ name: 'Python', value: 'python' },
+					{ name: 'Ruby', value: 'ruby' },
+					{ name: 'Rust', value: 'rust' },
+					{ name: 'SQL', value: 'sql' },
+					{ name: 'TypeScript', value: 'typescript' },
+					{ name: 'YAML', value: 'yaml' },
 				],
 				default: 'javascript',
-				description: 'Select the programming language for accurate syntax highlighting. Supports 18+ popular languages.',
+				description:
+					'Select the programming language for accurate syntax highlighting. Supports 18+ popular languages.',
 			},
 			{
 				displayName: 'Format',
@@ -110,24 +114,26 @@ export class CodeToImage implements INodeType {
 				name: 'theme',
 				type: 'options',
 				options: [
+					{ name: 'Catppuccin Mocha', value: 'catppuccin-mocha' },
+					{ name: 'Dracula', value: 'dracula' },
 					{ name: 'GitHub Dark', value: 'github-dark' },
 					{ name: 'GitHub Light', value: 'github-light' },
-					{ name: 'Dracula', value: 'dracula' },
 					{ name: 'Monokai', value: 'monokai' },
 					{ name: 'Nord', value: 'nord' },
 					{ name: 'One Dark Pro', value: 'one-dark-pro' },
 					{ name: 'Tokyo Night', value: 'tokyo-night' },
-					{ name: 'Catppuccin Mocha', value: 'catppuccin-mocha' },
 				],
 				default: 'github-dark',
-				description: 'Choose from 8 popular syntax highlighting themes. Each theme provides professional, VSCode-quality syntax coloring.',
+				description:
+					'Choose from 8 popular syntax highlighting themes. Each theme provides professional, VSCode-quality syntax coloring.',
 			},
 			{
 				displayName: 'Background',
 				name: 'background',
 				type: 'string',
 				default: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
-				description: 'CSS background color or gradient. Examples: solid color "#1a1a2e", gradient "linear-gradient(135deg, #667eea 0%, #764ba2 100%)", or "transparent"',
+				description:
+					'CSS background color or gradient. Examples: solid color "#1a1a2e", gradient "linear-gradient(135deg, #667eea 0%, #764ba2 100%)", or "transparent".',
 				placeholder: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
 			},
 			{
@@ -139,21 +145,24 @@ export class CodeToImage implements INodeType {
 					maxValue: 128,
 				},
 				default: 64,
-				description: 'Padding around the code block in pixels. Recommended: 64px for balanced spacing (range: 16-128)',
+				description:
+					'Padding around the code block in pixels. Recommended: 64px for balanced spacing (range: 16-128).',
 			},
 			{
 				displayName: 'Show Line Numbers',
 				name: 'showLineNumbers',
 				type: 'boolean',
 				default: true,
-				description: 'Display line numbers on the left side of the code block for better reference',
+				description:
+					'Whether to display line numbers on the left side of the code block for better reference',
 			},
 			{
 				displayName: 'Show Window Controls',
 				name: 'showWindowControls',
 				type: 'boolean',
 				default: true,
-				description: 'Display macOS-style window controls (red, yellow, green dots) at the top of the code window',
+				description:
+					'Whether to display macOS-style window controls (red, yellow, green dots) at the top of the code window',
 			},
 		],
 	};
@@ -161,7 +170,7 @@ export class CodeToImage implements INodeType {
 	async execute(this: IExecuteFunctions): Promise<INodeExecutionData[][]> {
 		const items = this.getInputData();
 		const returnData: INodeExecutionData[] = [];
-		const credentials = await this.getCredentials('CodeToImageApi');
+		const credentials = await this.getCredentials('codeToImageApi');
 		const baseUrl = 'https://1hsik4xyb5.execute-api.us-east-1.amazonaws.com/dev';
 
 		for (let i = 0; i < items.length; i++) {
@@ -177,7 +186,7 @@ export class CodeToImage implements INodeType {
 				const showWindowControls = this.getNodeParameter('showWindowControls', i) as boolean;
 
 				// Make HTTP request
-				const response = await this.helpers.request({
+				const options: IHttpRequestOptions = {
 					method: 'POST',
 					url: `${baseUrl}/generate`,
 					headers: {
@@ -194,10 +203,14 @@ export class CodeToImage implements INodeType {
 						showLineNumbers,
 						showWindowControls,
 					},
-					json: format === 'base64', // Parse JSON for base64 format
-					encoding: format === 'base64' ? 'utf8' : null, // Binary for SVG/PNG
-					resolveWithFullResponse: true,
-				});
+					returnFullResponse: true,
+				};
+
+				if (format === 'base64') {
+					options.json = true;
+				}
+
+				const response = await this.helpers.httpRequest(options);
 
 				// Handle response based on format
 				let binaryData;
@@ -205,7 +218,11 @@ export class CodeToImage implements INodeType {
 
 				if (format === 'base64') {
 					// Base64 format returns JSON with { data, mimeType, fileName }
-					const jsonResponse = response.body;
+					const jsonResponse = response.body as {
+						data: string;
+						mimeType?: string;
+						fileName?: string;
+					};
 					const base64Data = jsonResponse.data;
 					const buffer = Buffer.from(base64Data, 'base64');
 
@@ -218,22 +235,16 @@ export class CodeToImage implements INodeType {
 					// PNG returns binary data
 					const buffer = Buffer.isBuffer(response.body)
 						? response.body
-						: Buffer.from(response.body, 'binary');
+						: Buffer.from(response.body as ArrayBuffer);
 
-					binaryData = await this.helpers.prepareBinaryData(
-						buffer,
-						fileName,
-						'image/png',
-					);
+					binaryData = await this.helpers.prepareBinaryData(buffer, fileName, 'image/png');
 				} else {
 					// SVG returns text
-					const buffer = Buffer.from(response.body as string, 'utf8');
+					const buffer = Buffer.isBuffer(response.body)
+						? response.body
+						: Buffer.from(response.body as string, 'utf8');
 
-					binaryData = await this.helpers.prepareBinaryData(
-						buffer,
-						fileName,
-						'image/svg+xml',
-					);
+					binaryData = await this.helpers.prepareBinaryData(buffer, fileName, 'image/svg+xml');
 				}
 
 				// Return as binary data

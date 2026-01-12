@@ -2,13 +2,21 @@ import type {
 	IAuthenticateGeneric,
 	ICredentialTestRequest,
 	ICredentialType,
+	Icon,
 	INodeProperties,
 } from 'n8n-workflow';
 
-export class CodeToImageApi implements ICredentialType {
-	name = 'CodeToImageApi';
+export class codeToImageApi implements ICredentialType {
+	name = 'codeToImageApi';
 
-	displayName = 'Code To Image API. Visit https://codetoimage.microapplab.com to get oen';
+	displayName = 'Code To Image API';
+
+	documentationUrl = 'https://codetoimage.microapplab.com';
+
+	icon: Icon = {
+		light: 'file:../nodes/CodeToImage/codetoimage.svg',
+		dark: 'file:../nodes/CodeToImage/codetoimage_dark.svg',
+	};
 
 	properties: INodeProperties[] = [
 		{
@@ -20,8 +28,9 @@ export class CodeToImageApi implements ICredentialType {
 			},
 			default: '',
 			required: true,
-			description: 'Your Code to Image API key. Get your API key from the CodeToImage dashboard at https://codetoimage.microapplab.com',
-		}
+			description:
+				'Your Code to Image API key. Get your API key from the CodeToImage dashboard at https://codetoimage.microapplab.com',
+		},
 	];
 
 	authenticate: IAuthenticateGeneric = {
