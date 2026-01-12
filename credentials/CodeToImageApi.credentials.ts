@@ -10,8 +10,6 @@ export class CodeToImageApi implements ICredentialType {
 
 	displayName = 'Code To Image API';
 
-	documentationUrl = 'https://github.com/lokaresathyam2196/codetoimage-n8nnode';
-
 	properties: INodeProperties[] = [
 		{
 			displayName: 'API Key',
@@ -21,15 +19,16 @@ export class CodeToImageApi implements ICredentialType {
 				password: true,
 			},
 			default: '',
-			description: 'Your Code to Image API key from JAAS',
+			required: true,
+			description: 'Your Code to Image API key. Get your API key from the JAAS dashboard at https://ctoi-apis.microapplab.com',
 		},
 		{
 			displayName: 'Base URL',
 			name: 'baseUrl',
 			type: 'string',
-			default: 'https://your-lambda-url.execute-api.us-east-1.amazonaws.com/dev',
-			description: 'The base URL of your Code to Image Lambda API',
-			placeholder: 'https://abc123.execute-api.us-east-1.amazonaws.com/dev',
+			default: 'https://1hsik4xyb5.execute-api.us-east-1.amazonaws.com/dev',
+			description: 'The base URL of the Code to Image API (usually the default value)',
+			placeholder: 'https://1hsik4xyb5.execute-api.us-east-1.amazonaws.com/dev',
 		},
 	];
 

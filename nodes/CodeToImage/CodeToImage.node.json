@@ -8,12 +8,12 @@
 	"resources": {
 		"credentialDocumentation": [
 			{
-				"url": "https://github.com/lokaresathyam2196/codetoimage-n8nnode"
+				"url": "https://ctoi-apis.microapplab.com"
 			}
 		],
 		"primaryDocumentation": [
 			{
-				"url": "https://github.com/lokaresathyam2196/codetoimage-n8nnode"
+				"url": "https://www.npmjs.com/package/n8n-nodes-codetoimage"
 			}
 		]
 	}

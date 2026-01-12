@@ -10,8 +10,6 @@ export class CodeToImageApi implements ICredentialType {
 
 	displayName = 'Code To Image API';
 
-	documentationUrl = 'https://github.com/lokaresathyam2196/codetoimage-n8nnode';
-
 	properties: INodeProperties[] = [
 		{
 			displayName: 'API Key',
