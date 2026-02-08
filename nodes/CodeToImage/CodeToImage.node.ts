@@ -1,10 +1,12 @@
 import {
 	NodeConnectionTypes,
+	NodeApiError,
 	type INodeType,
 	type INodeTypeDescription,
 	type IExecuteFunctions,
 	type INodeExecutionData,
 	type IHttpRequestOptions,
+	type JsonObject,
 } from 'n8n-workflow';
 
 export class CodeToImage implements INodeType {
@@ -257,6 +259,7 @@ export class CodeToImage implements INodeType {
 					binary: {
 						data: binaryData,
 					},
+					pairedItem: { item: i },
 				});
 			} catch (error) {
 				if (this.continueOnFail()) {
@@ -264,10 +267,11 @@ export class CodeToImage implements INodeType {
 						json: {
 							error: error.message,
 						},
+						pairedItem: { item: i },
 					});
 					continue;
 				}
-				throw error;
+				throw new NodeApiError(this.getNode(), error as JsonObject, { itemIndex: i });
 			}
 		}
 
