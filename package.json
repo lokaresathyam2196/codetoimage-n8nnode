@@ -1,6 +1,6 @@
 {
 	"name": "n8n-nodes-codetoimage",
-	"version": "0.1.2",
+	"version": "0.1.3",
 	"description": "Convert code snippets into beautiful syntax-highlighted images (SVG/PNG/Base64) with 18+ language support, 8 themes, and customizable styling. Perfect for documentation, social media, and presentations.",
 	"license": "MIT",
 	"homepage": "https://www.npmjs.com/package/n8n-nodes-codetoimage",
