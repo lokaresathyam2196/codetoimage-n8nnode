@@ -57,7 +57,7 @@ export class CodeToImage implements INodeType {
 				default: '',
 				description:
 					'The code snippet to convert to an image. Supports multi-line code with proper formatting.',
-				placeholder: 'function hello() {\n  console.log("Hello World!");\n}',
+				placeholder: 'function hello() {\n  return "Hello World!";\n}',
 			},
 			{
 				displayName: 'Language',

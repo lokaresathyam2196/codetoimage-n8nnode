@@ -57,7 +57,7 @@ export class Example implements INodeType {
 				// This node should never fail but we want to showcase how
 				// to handle errors.
 				if (this.continueOnFail()) {
-					items.push({ json: this.getInputData(itemIndex)[0].json, error, pairedItem: itemIndex });
+					items.push({ json: this.getInputData(itemIndex)[0].json, error, pairedItem: { item: itemIndex } });
 				} else {
 					// Adding `itemIndex` allows other workflows to handle this error
 					if (error.context) {

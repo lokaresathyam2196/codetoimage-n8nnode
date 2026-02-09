@@ -48,7 +48,7 @@ export class CodeToImageApi implements ICredentialType {
 			url: '/generate',
 			method: 'POST',
 			body: {
-				code: 'console.log("test")',
+				code: 'Hello World',
 				format: 'svg',
 			},
 		},
